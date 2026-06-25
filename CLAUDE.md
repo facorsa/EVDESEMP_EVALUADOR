@@ -11,7 +11,10 @@ protegido por PIN.
 - HTML/CSS/JS plano, **sin build, sin framework, sin npm**. Se sirve estático.
 - `@supabase/supabase-js v2` (UMD) cargado por CDN desde `index.html`.
 - Backend = **Supabase** (proyecto `gsrivgwhmnbjzlbwdqlx`, org FARRHH "RRHH Facorsa").
-- Deploy: Vercel (sitio estático).
+- Repo: **GitHub org Facorsa** → `https://github.com/facorsa/EVDESEMP_EVALUADOR`
+  (remote `origin`). Migrado desde la cuenta personal `joselo1261`.
+- Deploy: **Vercel — cuenta Facorsa PRO** (`https://vercel.com/facorsa`), sitio estático.
+  Migrado desde la cuenta personal `joselo1261s-projects`.
 
 ## Archivos
 | Archivo | Qué es |
@@ -21,6 +24,7 @@ protegido por PIN.
 | `styles.css` | Estilos principales (heredados del portal). |
 | `styles-local-mobile.css` / `local-mobile.js` | Ajustes mobile específicos del standalone. |
 | `logo-white.png`, `evaluacion.png` | Assets. |
+| `favicon.svg` | Favicon (enlazado en `index.html` con `rel="icon" type="image/svg+xml"`). Misma base que el del portal madre (degradado celeste→azul, `rx=14`, viewBox `64×64`) pero con una **persona + tilde** en vez del gráfico de barras. |
 
 > Nota: la clave **anon** de Supabase está en `main.js` (línea ~10). Es pública por diseño
 > (es la anon key, no la service_role). La seguridad real depende de RLS + la RPC de PIN.
@@ -71,6 +75,17 @@ vacía o desincronizada — **no** es un bug del front.
 ---
 
 ## Registro de incidentes
+
+### 2026-06-25 — Migración de hosting a cuentas Facorsa
+- **GitHub:** el repo pasó de la cuenta personal `joselo1261`
+  (`https://github.com/joselo1261`) a la **org Facorsa**
+  (`https://github.com/orgs/facorsa/` → repo `facorsa/EVDESEMP_EVALUADOR`).
+  El remote `origin` local ya apunta a `https://github.com/facorsa/EVDESEMP_EVALUADOR.git`.
+- **Vercel:** el deploy pasó de la cuenta personal `joselo1261s-projects`
+  (`https://vercel.com/joselo1261s-projects`) a la **cuenta Facorsa PRO**
+  (`https://vercel.com/facorsa`).
+- **Sin cambios de código ni de base:** misma Supabase, mismo flujo. Solo cambió
+  dónde vive el repo y desde dónde se despliega.
 
 ### 2026-06-23 — "Legajo/PIN inválido" en todas las claves
 - **Síntoma:** todos los logins de evaluador fallaban con "Legajo/PIN inválido", incluida
