@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Favicon · opciones (persona)</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:#f1f5f9;color:#0f172a;margin:0;padding:32px}
+  h1{font-size:20px;margin:0 0 6px}
+  p.lead{margin:0 0 28px;color:#475569}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+  .card h2{font-size:15px;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+  .tag{font-size:11px;font-weight:700;color:#0369a1;background:#e0f2fe;border-radius:999px;padding:2px 8px}
+  .big{width:96px;height:96px}
+  .sizes{display:flex;align-items:flex-end;gap:14px;margin-top:14px;padding-top:14px;border-top:1px dashed #e2e8f0}
+  .sizes .s{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#64748b}
+  .s48{width:48px;height:48px}.s32{width:32px;height:32px}.s16{width:16px;height:16px}
+  .ref{display:flex;align-items:center;gap:14px;background:#0f172a;color:#e2e8f0;border-radius:14px;padding:14px 18px;margin-bottom:24px}
+  .ref svg{flex:0 0 auto}
+  .ref small{color:#94a3b8}
+</style>
+</head>
+<body>
+  <h1>Favicon — opciones con persona</h1>
+  <p class="lead">Misma base que el proyecto madre (fondo degradado redondeado, viewBox 64×64). Elegí una y la dejo como <code>favicon.svg</code>.</p>
+
+  <div class="ref">
+    <!-- Referencia: favicon ACTUAL del proyecto madre (gráfico de barras) -->
+    <svg width="48" height="48" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gr)"/>
+      <rect x="13" y="36" width="9" height="15" rx="2.5" fill="#fff"/>
+      <rect x="27" y="28" width="9" height="23" rx="2.5" fill="#fff"/>
+      <rect x="41" y="18" width="9" height="33" rx="2.5" fill="#fff"/>
+      <path d="M13 33 L26 24 L36 28 L50 13" fill="none" stroke="#fde047" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="50" cy="13" r="4" fill="#fde047"/>
+    </svg>
+    <div><strong>Referencia (madre)</strong><br><small>favicon.svg actual — gráfico de barras</small></div>
+  </div>
+
+  <div class="grid">
+
+    <!-- A: Persona simple -->
+    <div class="card">
+      <h2><span class="tag">A</span> Persona simple</h2>
+      <svg class="big" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+        <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gA)"/>
+        <circle cx="32" cy="25" r="10" fill="#fff"/>
+        <path d="M14 53 C14 42 23 37 32 37 C41 37 50 42 50 53 Z" fill="#fff"/>
+      </svg>
+      <div class="sizes">
+        <div class="s"><svg class="s48" viewBox="0 0 64 64"><use href="#useA"/></svg>48</div>
+        <div class="s"><svg class="s32" viewBox="0 0 64 64"><use href="#useA"/></svg>32</div>
+        <div class="s"><svg class="s16" viewBox="0 0 64 64"><use href="#useA"/></svg>16</div>
+      </div>
+    </div>
+
+    <!-- B: Persona + tilde (evaluación OK) -->
+    <div class="card">
+      <h2><span class="tag">B</span> Persona + tilde</h2>
+      <svg class="big" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+        <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gB)"/>
+        <circle cx="28" cy="24" r="9" fill="#fff"/>
+        <path d="M11 52 C11 41 19 36 28 36 C34 36 39 38 42 41" fill="none" stroke="#fff" stroke-width="0"/>
+        <path d="M11 53 C11 42 19 37 28 37 C37 37 45 42 45 53 Z" fill="#fff"/>
+        <path d="M39 30 L45 36 L56 22" fill="none" stroke="#fde047" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="sizes">
+        <div class="s"><svg class="s48" viewBox="0 0 64 64"><use href="#useB"/></svg>48</div>
+        <div class="s"><svg class="s32" viewBox="0 0 64 64"><use href="#useB"/></svg>32</div>
+        <div class="s"><svg class="s16" viewBox="0 0 64 64"><use href="#useB"/></svg>16</div>
+      </div>
+    </div>
+
+    <!-- C: Persona + estrella/check de evaluación (clipboard) -->
+    <div class="card">
+      <h2><span class="tag">C</span> Persona + planilla</h2>
+      <svg class="big" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+        <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gC)"/>
+        <circle cx="25" cy="23" r="8.5" fill="#fff"/>
+        <path d="M10 51 C10 41 17 36 25 36 C33 36 40 41 40 51 Z" fill="#fff"/>
+        <rect x="38" y="30" width="18" height="22" rx="2.5" fill="#fff"/>
+        <rect x="44" y="27" width="6" height="4" rx="1.5" fill="#fde047"/>
+        <path d="M41 38 L44 41 L49 35" fill="none" stroke="#0ea5e9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="41" y1="46" x2="53" y2="46" stroke="#cbd5e1" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <div class="sizes">
+        <div class="s"><svg class="s48" viewBox="0 0 64 64"><use href="#useC"/></svg>48</div>
+        <div class="s"><svg class="s32" viewBox="0 0 64 64"><use href="#useC"/></svg>32</div>
+        <div class="s"><svg class="s16" viewBox="0 0 64 64"><use href="#useC"/></svg>16</div>
+      </div>
+    </div>
+
+    <!-- D: Persona con estrella (desempeño) -->
+    <div class="card">
+      <h2><span class="tag">D</span> Persona + estrella</h2>
+      <svg class="big" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+        <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gD)"/>
+        <circle cx="28" cy="24" r="9.5" fill="#fff"/>
+        <path d="M12 53 C12 42 20 37 28 37 C37 37 45 42 45 53 Z" fill="#fff"/>
+        <path d="M47 16 l2.2 4.6 5 .7 -3.6 3.5 .9 5 -4.5 -2.4 -4.5 2.4 .9 -5 -3.6 -3.5 5 -.7 Z" fill="#fde047"/>
+      </svg>
+      <div class="sizes">
+        <div class="s"><svg class="s48" viewBox="0 0 64 64"><use href="#useD"/></svg>48</div>
+        <div class="s"><svg class="s32" viewBox="0 0 64 64"><use href="#useD"/></svg>32</div>
+        <div class="s"><svg class="s16" viewBox="0 0 64 64"><use href="#useD"/></svg>16</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- símbolos reutilizables para los tamaños chicos -->
+  <svg width="0" height="0" style="position:absolute">
+    <symbol id="useA" viewBox="0 0 64 64">
+      <defs><linearGradient id="gAu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gAu)"/>
+      <circle cx="32" cy="25" r="10" fill="#fff"/>
+      <path d="M14 53 C14 42 23 37 32 37 C41 37 50 42 50 53 Z" fill="#fff"/>
+    </symbol>
+    <symbol id="useB" viewBox="0 0 64 64">
+      <defs><linearGradient id="gBu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gBu)"/>
+      <circle cx="28" cy="24" r="9" fill="#fff"/>
+      <path d="M11 53 C11 42 19 37 28 37 C37 37 45 42 45 53 Z" fill="#fff"/>
+      <path d="M39 30 L45 36 L56 22" fill="none" stroke="#fde047" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="useC" viewBox="0 0 64 64">
+      <defs><linearGradient id="gCu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gCu)"/>
+      <circle cx="25" cy="23" r="8.5" fill="#fff"/>
+      <path d="M10 51 C10 41 17 36 25 36 C33 36 40 41 40 51 Z" fill="#fff"/>
+      <rect x="38" y="30" width="18" height="22" rx="2.5" fill="#fff"/>
+      <rect x="44" y="27" width="6" height="4" rx="1.5" fill="#fde047"/>
+      <path d="M41 38 L44 41 L49 35" fill="none" stroke="#0ea5e9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="41" y1="46" x2="53" y2="46" stroke="#cbd5e1" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="useD" viewBox="0 0 64 64">
+      <defs><linearGradient id="gDu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gDu)"/>
+      <circle cx="28" cy="24" r="9.5" fill="#fff"/>
+      <path d="M12 53 C12 42 20 37 28 37 C37 37 45 42 45 53 Z" fill="#fff"/>
+      <path d="M47 16 l2.2 4.6 5 .7 -3.6 3.5 .9 5 -4.5 -2.4 -4.5 2.4 .9 -5 -3.6 -3.5 5 -.7 Z" fill="#fde047"/>
+    </symbol>
+  </svg>
+</body>
+</html>
