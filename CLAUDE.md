@@ -6,6 +6,7 @@ de desempeño. Es una versión recortada ("standalone") del portal principal **E
 de datos Supabase, pero este proyecto **solo expone el flujo de "Realizar evaluación"**,
 protegido por PIN.
 
+
 ## Stack
 - HTML/CSS/JS plano, **sin build, sin framework, sin npm**. Se sirve estático.
 - `@supabase/supabase-js v2` (UMD) cargado por CDN desde `index.html`.
