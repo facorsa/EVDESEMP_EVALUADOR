@@ -245,12 +245,20 @@ function rrhhEnsurePinModal(){
       </div>
       <div style="padding:16px">
         <div style="font-size:14px;opacity:.85;margin-bottom:10px">
-          Ingresá tu <b>Legajo Nro.</b> (clave) para continuar.
+          Ingresá tu <b>Legajo Nro.</b> y tu <b>clave</b> para continuar.
         </div>
 
         <label for="rrhhLegajoNro" style="display:block;font-size:13px;margin:10px 0 6px">Legajo Nro.</label>
         <input id="rrhhLegajoNro" autocomplete="off" inputmode="text"
                style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,.18);border-radius:10px" />
+
+        <label for="rrhhPinClave" style="display:block;font-size:13px;margin:12px 0 6px">Clave</label>
+        <input id="rrhhPinClave" type="password" autocomplete="off" inputmode="text"
+               style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,.18);border-radius:10px" />
+
+        <div style="margin-top:8px;font-size:12px;opacity:.7">
+          Si todavía no recibiste una clave propia, usá tu Legajo Nro.
+        </div>
 
         <div id="rrhhPinErr" style="display:none;margin-top:10px;color:#b91c1c;font-size:13px"></div>
 
@@ -329,14 +337,25 @@ async function rrhhPromptAndCreateSession(supa){
       const legajoNro = String(inp?.value || '').trim().toUpperCase();
       if (!legajoNro){ setErr('Ingresá el Legajo Nro.'); inp?.focus(); return; }
 
+      // La clave va SEPARADA del legajo. Hasta 2026-08-26 se mandaba el numero
+      // de legajo como p_pin, o sea que no habia clave: saber que existe L0016
+      // alcanzaba para entrar como esa persona.
+      //
+      // Mientras los hashes de rrhh_eval_pin sigan siendo el numero de legajo,
+      // esto funciona igual que antes -la persona escribe su legajo en los dos
+      // campos-. Al generar claves reales, el numero de legajo deja de servir
+      // sin tocar una linea mas de codigo.
+      const inpClave = document.getElementById('rrhhPinClave');
+      const clave = String(inpClave?.value || '').trim();
+      if (!clave){ setErr('Ingresá tu clave.'); inpClave?.focus(); return; }
+
       setErr('');
       btnOk.disabled = true;
       btnOk.style.opacity = '.8';
 
-      // En tu diseño, la clave ES el Legajo Nro. ⇒ usamos el mismo valor para p_pin.
       const { data, error } = await supa.rpc('rrhh_validar_pin_crear_sesion', {
         p_legajo_nro: legajoNro,
-        p_pin: legajoNro,
+        p_pin: clave,
         p_horas: 12
       });
 
