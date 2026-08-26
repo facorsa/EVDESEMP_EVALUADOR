@@ -387,6 +387,8 @@ async function rrhhPromptAndCreateSession(supa){
 
     btnOk?.addEventListener('click', onOk);
     btnCancel?.addEventListener('click', onCancel);
+    // La X no tenía listener: cerraba visualmente nada y dejaba la promesa colgada.
+    document.getElementById('rrhhPinClose')?.addEventListener('click', onCancel, { once: true });
 
     // Mostrar modal
     modal.style.display = 'flex';
@@ -418,10 +420,13 @@ async function rrhhEnsureAuthorizedEvaluator(supa, targetEvaluadorId){
   const created = await rrhhPromptAndCreateSession(supa);
   if (!created.ok) return { ok:false, reason: created.cancelled ? 'cancelled' : 'invalid' };
 
-  // 3) Validar que la sesión creada sea del evaluador seleccionado.
+  // 3) La sesión creada puede ser de OTRO evaluador que el seleccionado: pasa
+  //    siempre que alguien elige mal el nombre de la lista. La sesión NO se
+  //    descarta -es válida, la clave es correcta-: se devuelve a quién
+  //    pertenece, y quien llama mueve la selección a esa persona. La clave es
+  //    la identidad; el desplegable es solo una ayuda para encontrarse.
   if (String(created.legajo_id) !== wanted){
-    rrhhClearStoredSession();
-    return { ok:false, reason:'pin_not_for_selected', created_legajo_id: created.legajo_id };
+    return { ok:false, reason:'pin_not_for_selected', created_legajo_id: String(created.legajo_id) };
   }
 
   return { ok:true, legajo_id: wanted, from:'created' };
@@ -1722,8 +1727,27 @@ async function initRealizar(){
 
     // Validar que el evaluador seleccionado sea el autorizado por sesión/PIN.
     const auth = await rrhhEnsureAuthorizedEvaluator(supa, nextId);
+
+    // La clave era correcta pero de otra persona: en vez de revertir en
+    // silencio -y obligar a buscar el nombre otra vez entre 82-, se mueve la
+    // selección a quien realmente validó.
+    if (!auth.ok && auth.reason === 'pin_not_for_selected' && auth.created_legajo_id){
+      const existe = Array.from(sel.options).some(o => String(o.value) === auth.created_legajo_id);
+      if (existe){
+        sel.value = auth.created_legajo_id;
+        rEvaluadorId = auth.created_legajo_id;
+        await rLoadEvaluados(supa);
+        return;
+      }
+      // Validó, pero esa persona no es evaluadora este año: no hay nada que mostrar.
+      rrhhClearStoredSession();
+      sel.value = prevId;
+      alert('Tu clave es correcta, pero no figurás como evaluador en ' + rAnio + '.');
+      return;
+    }
+
     if (!auth.ok){
-      // Volver a la selección anterior
+      // Clave incorrecta o cancelado: el modal ya mostró el motivo.
       sel.value = prevId;
       return;
     }
