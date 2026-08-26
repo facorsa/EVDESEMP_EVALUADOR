@@ -253,7 +253,8 @@ function rrhhEnsurePinModal(){
                style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,.18);border-radius:10px" />
 
         <label for="rrhhPinClave" style="display:block;font-size:13px;margin:12px 0 6px">Clave</label>
-        <input id="rrhhPinClave" type="password" autocomplete="off" inputmode="text"
+        <input id="rrhhPinClave" type="password" autocomplete="one-time-code" name="clave-evaluador"
+               data-1p-ignore data-lpignore="true" inputmode="text"
                style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,.18);border-radius:10px" />
 
         <div style="margin-top:8px;font-size:12px;opacity:.7">
@@ -345,8 +346,13 @@ async function rrhhPromptAndCreateSession(supa){
       // esto funciona igual que antes -la persona escribe su legajo en los dos
       // campos-. Al generar claves reales, el numero de legajo deja de servir
       // sin tocar una linea mas de codigo.
+      // .toUpperCase() igual que el legajo: mientras la clave transitoria ES el
+      // numero de legajo (L0014), escribirlo en minuscula fallaria contra un
+      // hash generado en mayusculas. Cuando se generen claves reales van a ser
+      // NUMERICAS de 6 digitos, asi que pasar a mayusculas no les cambia nada.
+      // Si alguna vez fueran alfanumericas, hay que sacar esta linea.
       const inpClave = document.getElementById('rrhhPinClave');
-      const clave = String(inpClave?.value || '').trim();
+      const clave = String(inpClave?.value || '').trim().toUpperCase();
       if (!clave){ setErr('Ingresá tu clave.'); inpClave?.focus(); return; }
 
       setErr('');
