@@ -75,6 +75,27 @@ SQL en el repo del portal: **`EvDesemp/SQL/Eval_Sesion.txt`** (ya ejecutado). Es
 grant select ("NuevaColumna") on public.rrhh_legajos_stage to anon;
 ```
 
+### El flujo completo, y por qué cada pieza está donde está
+
+| Momento | Qué corre | ¿Necesita sesión? |
+|---|---|---|
+| Arranque | `createClient()` lee la sesión de `localStorage` | — |
+| Lista de nombres | RPC `rrhh_eval_evaluadores(anio)` | **no** |
+| Retomar sesión | RPC `rrhh_validar_sesion(uuid)` | **no** |
+| Validar clave | RPC `rrhh_validar_pin_crear_sesion` | **no** |
+| Cargar evaluaciones | tablas `rrhh_eval_*` / `rrhh_cp_*` | **sí** |
+
+Los cuatro primeros son funciones `security definer`; el quinto son tablas. **Al agregar una pantalla, ubicá primero en qué fila cae**: si corre antes del login y toca tablas, va a volver vacía sin dar error.
+
+⚠️ **`createClient()` corre UNA vez y su referencia se reparte** (`const supa = createClient()`), con el header de sesión fijado en ese momento. Al validar todavía no hay sesión, así que esas referencias mandarían el header vacío para siempre — y limpiar el caché no alcanza, porque las referencias ya repartidas no cambian. Por eso **tras validar se hace `location.reload()`**, y al arrancar, si no hay `evaluador_id` en la URL, se retoma el de la sesión guardada (así el reload cae directo en las evaluaciones). El botón **"Cambiar de evaluador"** recarga por lo mismo: es la única forma de volver a quedar sin identificar.
+
+**Otras decisiones del login, con su motivo:**
+- La **clave se pasa a `.toUpperCase()`** igual que el legajo, porque la clave transitoria *es* el número de legajo y escribirlo en minúscula fallaría contra un hash generado en mayúsculas. Las claves reales van a ser **numéricas**, así que no les cambia nada. **Si alguna vez fueran alfanuméricas, hay que sacar esa línea.**
+- El campo lleva `autocomplete="one-time-code"` + `data-1p-ignore` / `data-lpignore`: los gestores de contraseñas ofrecían autocompletar la clave del *sitio* en vez de la del evaluador.
+- Si la clave es válida pero **de otro evaluador**, la selección se mueve a esa persona en vez de revertirse en silencio. **La clave es la identidad; el desplegable es solo una ayuda para encontrarse** entre 82 nombres.
+
+> 🐞 **Bug histórico, ya corregido:** `rrhh_validar_sesion` **nunca funcionó**. Declara `RETURNS TABLE(..., expires_at ...)` y su `UPDATE` usaba `expires_at` sin calificar → `42702 ambiguous` → 400 en cada arranque. No se notaba porque la app caía al modal del PIN y seguía. Se volvió bloqueante al pasar la validación de sesión al camino crítico. Arreglo en `EvDesemp/SQL/Fix_Validar_Sesion.txt`. **Moraleja: en una función `RETURNS TABLE`, calificá SIEMPRE las columnas con el alias de la tabla.**
+
 **Pendientes (fase 2):**
 - **El PIN es el número de legajo.** Conseguir una sesión válida requiere adivinar `L0001`…`L0119`. La sesión ya es obligatoria, pero la credencial no protege.
 - **Cualquier sesión válida ve todo**, no solo lo propio. Acotarlo requiere policies por fila cruzando `rrhh_eval_session.legajo_id` con `rrhh_eval_asignaciones`. Recién ahora es posible: antes no había identidad que consultar.
