@@ -1520,6 +1520,13 @@ async function rLoadEvaluadores(supa){
   }
 }
 
+// El boton solo tiene sentido con una sesion activa: si no hay nadie validado,
+// la lista ya esta disponible y no hay nada que cerrar.
+function rMostrarCambiarEval(){
+  const b = document.getElementById('rCambiarEval');
+  if (b) b.hidden = !rEvaluadorId;
+}
+
 async function rLoadEvaluados(supa){
   const list = document.getElementById('rList');
   if (!list) return;
@@ -1770,10 +1777,19 @@ async function initRealizar(){
     }
 
     rEvaluadorId = nextId;
+    rMostrarCambiarEval();
     await rLoadEvaluados(supa);
   });
 
   // Filtro por estado (Todos / Completa / Pendiente)
+  // Cierra la sesion y vuelve a la lista. Recarga a proposito: el cliente se
+  // arma UNA vez con el header de sesion, asi que la unica forma de volver a
+  // quedar sin identificar es reconstruirlo desde cero.
+  document.getElementById('rCambiarEval')?.addEventListener('click', () => {
+    rrhhClearStoredSession();
+    location.reload();
+  });
+
   document.getElementById('rFiltroEstado')?.addEventListener('change', async () => {
     await rLoadEvaluados(supa);
   });
@@ -1956,6 +1972,7 @@ async function initRealizar(){
   // init
   rSetState('Cargando...');
   await rLoadEvaluadores(supa);
+  rMostrarCambiarEval();
 
   const sel = document.getElementById('rEvaluador');
   if (sel && rEvaluadorId) sel.value = String(rEvaluadorId);
