@@ -1472,30 +1472,22 @@ function rCloseModal(){
 }
 
 async function rLoadEvaluadores(supa){
-  const { data, error } = await supa
-    .from(T_ASIG)
-    .select('evaluador_id')
-    .eq('anio', rAnio)
-    .eq('activo', true)
-    .limit(10000);
-
+  // Esta pantalla pide elegir el nombre ANTES de autenticarse, asi que corre
+  // sin sesion. Consultaba rrhh_eval_asignaciones + rrhh_legajos_stage
+  // directamente y desde que esas tablas exigen sesion volvia vacia: sin lista
+  // no se llega nunca a la pantalla de clave.
+  //
+  // La RPC es security definer y devuelve SOLO id + nombre de quienes evaluan
+  // ese anio. Ni asignaciones, ni evaluados, ni puntajes, ni ninguna otra
+  // columna del legajo. Ver EvDesemp/SQL/Eval_Lista_Evaluadores.txt.
+  const { data, error } = await supa.rpc('rrhh_eval_evaluadores', { p_anio: rAnio });
   if (error) throw error;
 
-  const ids = Array.from(new Set((data || []).map(r => String(r.evaluador_id)).filter(Boolean)));
-
-  let legs = [];
-  if (ids.length){
-    const { data: d2, error: e2 } = await supa
-      .from(T_LEGAJOS)
-      .select('"ID","Nombre Completo"')
-      .in('ID', ids)
-      .limit(5000);
-    if (e2) throw e2;
-    legs = d2 || [];
-  }
-
-  const map = new Map(legs.map(l => [String(l['ID']), l['Nombre Completo'] || '—']));
-  const pairs = ids.map(id => ({ value: id, label: map.get(id) || `ID ${id}` }));
+  // Ordenados por nombre: es una lista para que una persona se encuentre a si
+  // misma. Antes salian en el orden en que aparecian las asignaciones.
+  const pairs = (data || [])
+    .map(r => ({ value: String(r.id), label: r.nombre || '—' }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }));
 
   fillSelectPairs(document.getElementById('rEvaluador'), pairs, { includeAllLabel: 'Seleccionar...' });
 
