@@ -382,6 +382,16 @@ async function rrhhPromptAndCreateSession(supa){
 
       rrhhStoreSession({ session_id: row.session_id, legajo_id: row.legajo_id, legajo_nro: legajoNro });
       cleanup();
+
+      // Recargar es lo unico que garantiza que la sesion llegue a la base.
+      // createClient() corre UNA vez al arrancar y su referencia se reparte a
+      // todas las funciones (const supa = createClient()), con el header ya
+      // fijado en ese momento: al validar todavia no habia sesion, asi que
+      // esas referencias mandan el header vacio para siempre. Limpiar el cache
+      // no alcanza -las referencias ya repartidas no cambian-. Al recargar, el
+      // cliente se arma con la sesion ya guardada en localStorage, y el arranque
+      // la retoma solo (ver mas abajo, rEvaluadorId desde la sesion guardada).
+      location.reload();
       resolve({ ok:true, legajo_id: String(row.legajo_id), session_id: String(row.session_id), expires_at: row.expires_at || null });
     };
 
@@ -1688,6 +1698,13 @@ async function initRealizar(){
 
   const params = new URLSearchParams(location.search);
   rEvaluadorId = params.get('evaluador_id') || '';
+
+  // Sin evaluador en la URL, se retoma el de la sesion guardada. Es lo que hace
+  // que despues del reload de la validacion caigas directo en tus evaluaciones
+  // en vez de tener que buscar tu nombre otra vez entre 82.
+  if (!rEvaluadorId){
+    rEvaluadorId = rrhhGetStoredSession().legajoId || '';
+  }
   rAutoEvaluadoId = params.get('evaluado_id') || '';
   rAnio = Number(params.get('anio') || document.getElementById('rAnio')?.value || 2026) || 2026;
 
