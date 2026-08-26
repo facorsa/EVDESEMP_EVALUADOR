@@ -46,10 +46,40 @@ No usa Supabase Auth. Es un esquema propio basado en número de legajo:
    (`rrhhStoreSession`). La sesión expira a las 12 h; `rrhhClearStoredSession()` limpia.
 5. Al evaluar se valida que el evaluador seleccionado coincida con el de la sesión
    (`rrhhEnsureAuthorizedEvaluator`).
+6. **Desde 2026-08-26 la sesión también viaja a la base**, en el header
+   **`x-eval-session`** que arma `createClient()` leyendo
+   `localStorage['rrhh_eval_session_id']`. Ya no es solo un control del front:
+   sin sesión viva, Postgres no devuelve nada (ver **Seguridad de datos**).
 
 **Importante:** el mensaje "Legajo/PIN inválido" lo emite la **RPC en Postgres**, no el
 front ni Vercel. Si todas las claves fallan, casi siempre es porque `rrhh_eval_pin` está
 vacía o desincronizada — **no** es un bug del front.
+
+## Seguridad de datos: la sesión es obligatoria (agosto 2026)
+
+SQL en el repo del portal: **`EvDesemp/SQL/Eval_Sesion.txt`** (ya ejecutado). Esta app es la otra mitad del mismo cambio.
+
+**Qué pasaba.** Las tablas `rrhh_eval_*` / `rrhh_cp_*` tenían policies `anon | ALL | using(true)`. El PIN se validaba de verdad —la RPC es `SECURITY DEFINER` y compara bcrypt—, pero después **todas las queries salían con la anon key**, que va pública en este archivo. Cualquiera podía saltear el PIN y pegarle a PostgREST directo: las ~1741 respuestas de evaluación se leían, reescribían o borraban sin credenciales.
+
+**Cómo se cerró.** PostgREST expone los headers a la RLS. `createClient()` manda el `session_id` en `x-eval-session`, y las policies lo validan contra `rrhh_eval_session` con `public.eval_sesion_valida()`. La sesión que ya creaba `rrhh_validar_pin_crear_sesion` dejó de ser decorativa: **ahora es lo que habilita el acceso**.
+
+**Reglas al tocar esto:**
+- ⚠️ **El cliente queda cacheado en `window.supabaseClient` con el header que tenía al crearse.** En el login todavía no hay sesión, así que `rrhhStoreSession()` y `rrhhClearStoredSession()` llaman a **`rrhhResetClient()`**. Si algún día se guarda la sesión por otro camino, hay que llamarlo también o todas las queries seguirán saliendo sin identificar — y **vuelven vacías, sin error**, que es lo peor de diagnosticar.
+- **`anon` no está revocado**: la app sigue entrando como anon. Lo que cambia es que anon sin sesión no ve nada. No revocar el grant.
+- Las sesiones duran **12 h**. Si de golpe todo vuelve vacío sin error, descartar primero sesión vencida.
+- La RPC del login **no necesita** sesión (obviamente) y sigue siendo ejecutable por `anon`. `rrhh_eval_pin` ya **no** es legible directamente: la lee solo la RPC.
+
+⚠️ **`rrhh_legajos_stage` se consulta como `anon`, que tiene grant por COLUMNA** (7: `"ID"`, `"Nombre Completo"`, `"Sucursal"`, `"Gerencia"`, `"Sector"`, `"Descripcion Puesto"`, `"Baja"`). Pedir una octava hace que PostgREST rechace **la request entera con 401** — no falla esa columna, falla todo. Ya rompió el dashboard del portal durante dos días sin que nadie lo notara. Al sumar una columna a un `select`:
+
+```sql
+grant select ("NuevaColumna") on public.rrhh_legajos_stage to anon;
+```
+
+**Pendientes (fase 2):**
+- **El PIN es el número de legajo.** Conseguir una sesión válida requiere adivinar `L0001`…`L0119`. La sesión ya es obligatoria, pero la credencial no protege.
+- **Cualquier sesión válida ve todo**, no solo lo propio. Acotarlo requiere policies por fila cruzando `rrhh_eval_session.legajo_id` con `rrhh_eval_asignaciones`. Recién ahora es posible: antes no había identidad que consultar.
+
+---
 
 ## Tablas Supabase que toca (constantes en `main.js`)
 - `rrhh_legajos_stage` (`T_LEGAJOS`) — padrón. Columnas con espacios/mayúsculas:
