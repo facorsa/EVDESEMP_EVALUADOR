@@ -4758,3 +4758,16 @@ body[data-page="aviso_evaluadores"] .btn-icon.ae-send.no-email:disabled{
   opacity: 1;
   cursor: not-allowed;
 }
+
+/* "Cambiar de evaluador" convive con los pills de .filter, que miden 42px de
+   alto. Con la altura de .btn (32px) quedaba mas bajo, y sin nowrap el flex lo
+   comprimia y le partia el texto en dos lineas. */
+#rCambiarEval{
+  height: 42px;
+  padding: 0 16px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  font-weight: 600;
+  color: var(--muted, #64748b);
+}
+#rCambiarEval:hover{ color: inherit; }
