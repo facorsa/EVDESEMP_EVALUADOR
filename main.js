@@ -141,8 +141,28 @@ function createClient(){
   // Evita multiples instancias (warning: Multiple GoTrueClient instances detected)
   if (window.supabaseClient) return window.supabaseClient;
   if (!window.supabase) throw new Error('No se cargo el SDK de Supabase.');
-  window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // El id de sesion viaja en un header propio. Las policies de las tablas
+  // rrhh_eval_* / rrhh_cp_* lo leen (PostgREST expone los headers a la RLS) y
+  // lo validan contra rrhh_eval_session: sin sesion viva, la base no devuelve
+  // nada. Antes alcanzaba con la anon key, que va publica en este archivo.
+  //
+  // Al loguear y al cerrar sesion hay que llamar rrhhResetClient(): el cliente
+  // queda cacheado en window.supabaseClient con el header que tenia al
+  // crearse, asi que si no se recrea sigue mandando el valor viejo (o vacio).
+  let sid = '';
+  try { sid = localStorage.getItem('rrhh_eval_session_id') || ''; } catch(_){}
+
+  window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { headers: { 'x-eval-session': sid } }
+  });
   return window.supabaseClient;
+}
+
+// Fuerza que la proxima createClient() reconstruya el cliente con el header
+// actualizado. Ver el comentario de arriba.
+function rrhhResetClient(){
+  try { window.supabaseClient = null; } catch(_){}
 }
 
 // Helper para mostrar errores completos de PostgREST/Supabase
@@ -193,6 +213,7 @@ function rrhhClearStoredSession(){
     localStorage.removeItem(RRHH_EVAL_LEGAJO_ID_KEY);
     localStorage.removeItem(RRHH_EVAL_LEGAJO_NRO_KEY);
   }catch(_){}
+  rrhhResetClient();
 }
 
 function rrhhStoreSession({ session_id, legajo_id, legajo_nro }){
@@ -201,6 +222,9 @@ function rrhhStoreSession({ session_id, legajo_id, legajo_nro }){
     localStorage.setItem(RRHH_EVAL_LEGAJO_ID_KEY, String(legajo_id || ''));
     if (legajo_nro) localStorage.setItem(RRHH_EVAL_LEGAJO_NRO_KEY, String(legajo_nro).trim().toUpperCase());
   }catch(_){}
+  // El cliente se creo antes del login, sin sesion en el header: hay que
+  // rehacerlo o todas las queries seguirian saliendo sin identificar.
+  rrhhResetClient();
 }
 
 function rrhhEnsurePinModal(){
