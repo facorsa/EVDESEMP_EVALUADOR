@@ -69,7 +69,7 @@ SQL en el repo del portal: **`EvDesemp/SQL/Eval_Sesion.txt`** (ya ejecutado). Es
 - Las sesiones duran **12 h**. Si de golpe todo vuelve vacío sin error, descartar primero sesión vencida.
 - La RPC del login **no necesita** sesión (obviamente) y sigue siendo ejecutable por `anon`. `rrhh_eval_pin` ya **no** es legible directamente: la lee solo la RPC.
 
-⚠️ **`rrhh_legajos_stage` se consulta como `anon`, que tiene grant por COLUMNA** (7: `"ID"`, `"Nombre Completo"`, `"Sucursal"`, `"Gerencia"`, `"Sector"`, `"Descripcion Puesto"`, `"Baja"`). Pedir una octava hace que PostgREST rechace **la request entera con 401** — no falla esa columna, falla todo. Ya rompió el dashboard del portal durante dos días sin que nadie lo notara. Al sumar una columna a un `select`:
+⚠️ **`rrhh_legajos_stage` se consulta como `anon`, que tiene grant por COLUMNA** (8: `"ID"`, `"Legajo Nro."`, `"Nombre Completo"`, `"Sucursal"`, `"Gerencia"`, `"Sector"`, `"Descripcion Puesto"`, `"Baja"`. Esta app usa solo 6; las otras dos las necesita el portal). Pedir una octava hace que PostgREST rechace **la request entera con 401** — no falla esa columna, falla todo. Ya rompió dos pantallas del portal -dashboard y Aviso Evaluadores- durante dos dias sin que nadie lo notara. Al sumar una columna a un `select`:
 
 ```sql
 grant select ("NuevaColumna") on public.rrhh_legajos_stage to anon;
