@@ -7,7 +7,7 @@
 */
 
 const SUPABASE_URL = 'https://gsrivgwhmnbjzlbwdqlx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdzcml2Z3dobW5ianpsYndkcWx4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MzAyNjYsImV4cCI6MjA3NDMwNjI2Nn0.v05nTMG5YzBStG_micruXMyd-NIGRfzTnCtjJu7uqb0';
+const SUPABASE_ANON_KEY = 'sb_publishable_vklDbUhuRCjQXE5vrayMfw_FsowlMX2';
 
 const T_LEGAJOS = 'rrhh_legajos_stage';
 const T_ASIG = 'rrhh_eval_asignaciones';
