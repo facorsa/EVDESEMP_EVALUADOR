@@ -8,6 +8,8 @@
 
 const SUPABASE_URL = 'https://gsrivgwhmnbjzlbwdqlx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_vklDbUhuRCjQXE5vrayMfw_FsowlMX2';
+const EVDESEMP_SCHEMA = 'evdesemp';
+const PUBLIC_SCHEMA = 'public';
 
 const T_LEGAJOS = 'rrhh_legajos_stage';
 const T_ASIG = 'rrhh_eval_asignaciones';
@@ -154,6 +156,7 @@ function createClient(){
   try { sid = localStorage.getItem('rrhh_eval_session_id') || ''; } catch(_){}
 
   window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    db: { schema: EVDESEMP_SCHEMA },
     global: { headers: { 'x-eval-session': sid } }
   });
   return window.supabaseClient;
@@ -628,6 +631,7 @@ async function initInicio(){
 
   // Leer solo activos
   const { data, error } = await supa
+    .schema(PUBLIC_SCHEMA)
     .from(T_LEGAJOS)
     .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector","Baja"')
     .eq('Baja', 'Activo')
@@ -888,6 +892,7 @@ async function initEvaluaciones(){
   // Cargar evaluador elegido
   if (evaluadorId){
     const { data, error } = await supa
+      .schema(PUBLIC_SCHEMA)
       .from(T_LEGAJOS)
       .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector"')
       .eq('ID', evaluadorId)
@@ -910,6 +915,7 @@ async function initEvaluaciones(){
   // Cargar lista de evaluables (por flags.es_evaluable_desempeno)
   // Nota: NO usamos rrhh_legajos_stage.es_evaluable (migracion a flags)
   const { data: dLeg, error: eLeg } = await supa
+    .schema(PUBLIC_SCHEMA)
     .from(T_LEGAJOS)
     .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector","Baja"')
     .eq('Baja', 'Activo')
@@ -1108,6 +1114,7 @@ async function initListado(){
     let legajos = [];
     if (ids.length){
       const { data: legs, error: e2 } = await supa
+        .schema(PUBLIC_SCHEMA)
         .from(T_LEGAJOS)
         .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector"')
         .in('ID', ids)
@@ -1577,6 +1584,7 @@ async function rLoadEvaluados(supa){
   let legs = [];
   if (idsElegibles.length){
     const { data: d2, error: e2 } = await supa
+      .schema(PUBLIC_SCHEMA)
       .from(T_LEGAJOS)
       .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector"')
       .in('ID', idsElegibles)
@@ -2213,6 +2221,7 @@ async function loadListadoEvaluacionesData(supa){
   let legajosMap = new Map();
   if (idArr.length){
     const { data: legs, error: legErr } = await supa
+      .schema(PUBLIC_SCHEMA)
       .from(T_LEGAJOS)
       .select('"ID","Nombre Completo","Sucursal","Gerencia","Baja"')
       .in('ID', idArr)
@@ -2524,6 +2533,7 @@ async function cLoadList(){
 
   // 1) Legajos activos (la elegibilidad se controla SOLO por rrhh_legajo_flags.es_evaluable_cp)
   const { data: legs, error: legErr } = await supa
+    .schema(PUBLIC_SCHEMA)
     .from(T_LEGAJOS)
     .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector","Baja"')
     .eq('Baja', 'Activo')
@@ -3055,6 +3065,7 @@ async function flagsLoad(){
 
   // 1) Legajos activos
   const { data: legajos, error: e1 } = await supa
+    .schema(PUBLIC_SCHEMA)
     .from(T_LEGAJOS)
     // Nota: ya NO dependemos de rrhh_legajos_stage.es_evaluable (se migró a rrhh_legajo_flags)
     .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector","Baja"')
@@ -3490,6 +3501,7 @@ function resValorTagClass(v){
 
 async function resLoadLegajos(supa){
   const { data, error } = await supa
+    .schema(PUBLIC_SCHEMA)
     .from(T_LEGAJOS)
     .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector","Baja"')
     .eq('Baja', 'Activo')
@@ -4441,6 +4453,7 @@ function cmpCleanName(s){
 
 async function cmpLoadLegajos(supa){
   const { data, error } = await supa
+    .schema(PUBLIC_SCHEMA)
     .from(T_LEGAJOS)
     .select('"ID","Nombre Completo","Baja"')
     .eq('Baja', 'Activo')
@@ -6956,6 +6969,7 @@ async function initDashboard(){
 
     // 2) Legajos (para sucursal/gerencia/nombre)
     const { data: legs, error: errLeg } = await supa
+      .schema(PUBLIC_SCHEMA)
       .from(T_LEGAJOS)
       .select('"ID","Nombre Completo","Sucursal","Gerencia","Sector","Baja"')
       .eq('Baja', 'Activo')
@@ -7657,6 +7671,7 @@ inp.addEventListener('blur', _kick);
     // rrhh_legajos_stage usa columnas con espacios y mayúsculas:
     // "ID","Nombre Completo","Sucursal","Gerencia","Baja"
     const { data: legs, error: eLeg } = await supa
+      .schema(PUBLIC_SCHEMA)
       .from(T_LEGAJOS)
       .select('"ID","Nombre Completo","Sucursal","Gerencia","Baja"')
       .in('ID', evalIds);
