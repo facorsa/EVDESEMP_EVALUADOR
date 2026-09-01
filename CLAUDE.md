@@ -16,6 +16,18 @@ protegido por PIN.
 - Deploy: **Vercel — cuenta Facorsa PRO** (`https://vercel.com/facorsa`), sitio estático.
   Migrado desde la cuenta personal `joselo1261s-projects`.
 
+## Schema Supabase `evdesemp` (2026-09-01)
+
+El modulo fue migrado productivamente de `public` a **`evdesemp`**. El cliente
+de `main.js` usa `db.schema = 'evdesemp'`, por lo que tablas y RPC del modulo
+resuelven alli. Las 12 lecturas de `rrhh_legajos_stage` usan explicitamente
+`.schema('public')`, porque el padron sigue siendo compartido. No quitar esa
+separacion ni volver a crear objetos `rrhh_eval_*`/`rrhh_cp_*` en `public`.
+
+Commit del corte: `7392a54`. Se verificaron login por PIN, sesion, evaluador,
+empleados asignados y apertura de una evaluacion existente. El snapshot,
+runbook y rollback viven en el repo `EvDesemp`.
+
 ## Archivos
 | Archivo | Qué es |
 |---|---|
@@ -61,7 +73,7 @@ SQL en el repo del portal: **`EvDesemp/SQL/Eval_Sesion.txt`** (ya ejecutado). Es
 
 **Qué pasaba.** Las tablas `rrhh_eval_*` / `rrhh_cp_*` tenían policies `anon | ALL | using(true)`. El PIN se validaba de verdad —la RPC es `SECURITY DEFINER` y compara bcrypt—, pero después **todas las queries salían con la anon key**, que va pública en este archivo. Cualquiera podía saltear el PIN y pegarle a PostgREST directo: las ~1741 respuestas de evaluación se leían, reescribían o borraban sin credenciales.
 
-**Cómo se cerró.** PostgREST expone los headers a la RLS. `createClient()` manda el `session_id` en `x-eval-session`, y las policies lo validan contra `rrhh_eval_session` con `public.eval_sesion_valida()`. La sesión que ya creaba `rrhh_validar_pin_crear_sesion` dejó de ser decorativa: **ahora es lo que habilita el acceso**.
+**Cómo se cerró.** PostgREST expone los headers a la RLS. `createClient()` manda el `session_id` en `x-eval-session`, y las policies lo validan contra `rrhh_eval_session` con `evdesemp.eval_sesion_valida()`. La sesión que ya creaba `rrhh_validar_pin_crear_sesion` dejó de ser decorativa: **ahora es lo que habilita el acceso**.
 
 **Reglas al tocar esto:**
 - ⚠️ **El cliente queda cacheado en `window.supabaseClient` con el header que tenía al crearse.** En el login todavía no hay sesión, así que `rrhhStoreSession()` y `rrhhClearStoredSession()` llaman a **`rrhhResetClient()`**. Si algún día se guarda la sesión por otro camino, hay que llamarlo también o todas las queries seguirán saliendo sin identificar — y **vuelven vacías, sin error**, que es lo peor de diagnosticar.
