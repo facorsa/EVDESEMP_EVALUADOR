@@ -9,7 +9,11 @@ protegido por PIN.
 
 ## Stack
 - HTML/CSS/JS plano, **sin build, sin framework, sin npm**. Se sirve estático.
-- `@supabase/supabase-js v2` (UMD) cargado por CDN desde `index.html`.
+- `@supabase/supabase-js` **fijado en `2.118.0`** (UMD) cargado por CDN jsDelivr desde
+  `index.html` (commit `68d2f32`, 2026-10-23). Antes iba `@2` flotante; se fijó la versión
+  para que un release nuevo de la librería no cambie el comportamiento en producción sin
+  aviso. Para actualizar: cambiar el número en el `<script>` y probar login por PIN +
+  carga de evaluaciones (el header `x-eval-session` depende de `createClient()`).
 - Backend = **Supabase** (proyecto `gsrivgwhmnbjzlbwdqlx`, org FARRHH "RRHH Facorsa").
 - Repo: **GitHub org Facorsa** → `https://github.com/facorsa/EVDESEMP_EVALUADOR`
   (remote `origin`). Migrado desde la cuenta personal `joselo1261`.
