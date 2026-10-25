@@ -171,3 +171,9 @@ Los cuatro primeros son funciones `security definer`; el quinto son tablas. **Al
   - Idempotente (`NOT EXISTS`). Verificado: `crypt('L0016', pin_hash) = pin_hash` → `true`.
 - **Prevención:** quitar `DELETE FROM rrhh_eval_pin` del script de limpieza (mover a
   "CONSERVAR"): es credencial de acceso, no data de prueba.
+
+## Seguridad en la base compartida (2026-10-25)
+Auditoría de acceso sin sesión hecha desde RRHH (detalle en `C:\Proyectos\RRHH_Next\CLAUDE.md`). Lo que afecta a esta app, que entra como `anon` con la clave publicable:
+- **`rrhh_legajos_stage`**: `anon` ya **no** tiene SELECT de tabla; solo de estas columnas: `ID, Legajo Nro., Nombre Completo, Apellidos, Nombres, Sucursal, Gerencia, Sector, Sector Organigrama, Descripcion Puesto, Unidad Negocio, Baja`. Todos los `select(...)` de `main.js` hoy están dentro de esa lista (verificado en el código y con los registros de la API: pedidos de esta app con 200 después del cambio). **No pedir otras columnas (ni `select('*')`) sin sesión**; si hace falta una: `grant select ("columna") on public.rrhh_legajos_stage to anon;`. `api/eval-send-mail.mjs` usa la clave de servicio y no se ve afectado.
+- Las tablas `rrhh_eval_*` / `rrhh_cp_*` y `rrhh_legajo_flags` **no se tocaron** (siguen con las políticas `eval_sesion_*` protegidas por `eval_sesion_valida()`).
+- Se cerró la lectura anónima de `rrhh_asistencias`, `rrhh_licencias`, `rrhh_certificados`, `comp_*` y `rrhh_valoraciones`: esta app no las usa.
